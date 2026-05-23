@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam CGPA / Percentage Calculator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: rgba(15, 23, 42, 0.86);
+      --card: rgba(30, 41, 59, 0.96);
+      --border: rgba(148, 163, 184, 0.2);
+      --text: #e2e8f0;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --danger: #fb7185;
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 18%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 20%),
+        linear-gradient(145deg, #020617, #111827 60%, #0f172a);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1100px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 3.5rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 1.2rem 0 1.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 720px;
+      margin: 0.8rem auto 0;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.15rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .panel h2 {
+      margin: 0 0 0.85rem;
+      font-size: 1.1rem;
+    }
+
+    .panel p.desc {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.97rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    input, select, button {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font: inherit;
+    }
+
+    input, select {
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text);
+      padding: 0.8rem 0.9rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(56, 189, 248, 0.7);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: #fff;
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 0;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+    button.secondary {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.8rem;
+    }
+
+    .subjects {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .subject-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr auto;
+      gap: 0.65rem;
+      align-items: end;
+    }
+
+    .subject-row button {
+      width: auto;
+      min-width: 42px;
+      padding: 0.85rem;
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .result-card {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+    }
+
+    .result-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .result-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .result-note {
+      color: var(--muted);
+      margin-top: 0.6rem;
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.9rem;
+    }
+
+    .mini-box {
+      padding: 0.85rem;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+    }
+
+    .mini-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .mini-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      background: rgba(34, 197, 94, 0.12);
+      color: #86efac;
+      font-size: 0.8rem;
+      margin-left: 0.4rem;
+    }
+
+    @media (max-width: 720px) {
+      .form-row,
+      .subject-row,
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>Exam CGPA / Percentage Calculator</h1>
+      <p>Quickly calculate your CGPA from subject grades and credits, or convert your exam marks into a percentage. Use the tools below to estimate results in seconds.</p>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>CGPA Calculator <span class="tag">grade-based</span></h2>
+        <p class="desc">Enter each subject's grade point and credit hours. The calculator will compute the weighted CGPA and also show a percentage estimate.</p>
+
+        <div id="subject-list" class="subjects"></div>
+
+        <div class="button-row">
+          <button id="add-subject" type="button">+ Add Subject</button>
+          <button id="clear-subjects" type="button" class="secondary">Reset</button>
+        </div>
+
+        <div class="result-card">
+          <div class="result-title">CGPA</div>
+          <div id="cgpa-result" class="result-value">0.00</div>
+          <div class="result-note">Estimated percentage: <strong id="cgpa-percent">0.00%</strong></div>
+          <div class="mini-grid">
+            <div class="mini-box">
+              <span class="mini-label">Total weighted points</span>
+              <div id="weighted-points" class="mini-value">0.00</div>
+            </div>
+            <div class="mini-box">
+              <span class="mini-label">Total credits</span>
+              <div id="total-credits" class="mini-value">0.00</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Percentage Calculator <span class="tag">marks-based</span></h2>
+        <p class="desc">Enter your obtained marks and the total marks to calculate your exam percentage instantly.</p>
+
+        <div class="form-row">
+          <div>
+            <label for="obtained-marks">Obtained marks</label>
+            <input id="obtained-marks" type="number" min="0" step="0.01" placeholder="e.g. 420" />
+          </div>
+          <div>
+            <label for="total-marks">Total marks</label>
+            <input id="total-marks" type="number" min="1" step="0.01" placeholder="e.g. 500" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="percent-conversion">Optional conversion</label>
+            <select id="percent-conversion">
+              <option value="plain">Percentage only</option>
+              <option value="cgpa">Estimate CGPA from percentage</option>
+            </select>
+          </div>
+          <div>
+            <label for="scale">Scale</label>
+            <select id="scale">
+              <option value="10">10-point CGPA</option>
+              <option value="4">4-point CGPA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="calculate-percent" type="button">Calculate</button>
+          <button id="reset-percent" type="button" class="secondary">Reset</button>
+        </div>
+
+        <div class="result-card">
+          <div class="result-title">Result</div>
+          <div id="percent-result" class="result-value">0.00%</div>
+          <div class="result-note">Use this result to compare your exam performance across subjects or semesters.</div>
+          <div id="percent-note" class="result-note"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const subjectList = document.getElementById('subject-list');
+    const addSubjectButton = document.getElementById('add-subject');
+    const clearSubjectButton = document.getElementById('clear-subjects');
+
+    const cgpaResult = document.getElementById('cgpa-result');
+    const cgpaPercent = document.getElementById('cgpa-percent');
+    const weightedPoints = document.getElementById('weighted-points');
+    const totalCredits = document.getElementById('total-credits');
+
+    const obtainedMarks = document.getElementById('obtained-marks');
+    const totalMarks = document.getElementById('total-marks');
+    const percentConversion = document.getElementById('percent-conversion');
+    const scale = document.getElementById('scale');
+    const calculatePercent = document.getElementById('calculate-percent');
+    const resetPercent = document.getElementById('reset-percent');
+    const percentResult = document.getElementById('percent-result');
+    const percentNote = document.getElementById('percent-note');
+
+    let subjectCount = 0;
+
+    function createSubjectRow() {
+      subjectCount += 1;
+      const row = document.createElement('div');
+      row.className = 'subject-row';
+      row.dataset.subjectId = subjectCount;
+      row.innerHTML = `
+        <div>
+          <label for="subject-name-${subjectCount}">Subject</label>
+          <input id="subject-name-${subjectCount}" type="text" placeholder="e.g. Mathematics" value="Subject ${subjectCount}" />
+        </div>
+        <div>
+          <label for="subject-grade-${subjectCount}">Grade point</label>
+          <input id="subject-grade-${subjectCount}" type="number" min="0" max="10" step="0.01" value="8.0" />
+        </div>
+        <div>
+          <label for="subject-credit-${subjectCount}">Credits</label>
+          <input id="subject-credit-${subjectCount}" type="number" min="1" step="0.1" value="3" />
+        </div>
+        <div>
+          <button type="button" aria-label="Remove subject">✕</button>
+        </div>
+      `;
+      row.querySelector('button').addEventListener('click', () => row.remove());
+      return row;
+    }
+
+    function calculateCgpa() {
+      let totalWeighted = 0;
+      let totalCreditsValue = 0;
+
+      Array.from(subjectList.querySelectorAll('.subject-row')).forEach((row) => {
+        const grade = parseFloat(row.querySelector('input[type="number"]').value);
+        const credits = parseFloat(row.querySelectorAll('input[type="number"]')[1].value);
+        if (Number.isFinite(grade) && Number.isFinite(credits)) {
+          totalWeighted += grade * credits;
+          totalCreditsValue += credits;
+        }
+      });
+
+      const cgpa = totalCreditsValue > 0 ? totalWeighted / totalCreditsValue : 0;
+      const percentage = (cgpa - 0.75) * 10;
+
+      cgpaResult.textContent = cgpa.toFixed(2);
+      cgpaPercent.textContent = `${Math.max(percentage, 0).toFixed(2)}%`;
+      weightedPoints.textContent = totalWeighted.toFixed(2);
+      totalCredits.textContent = totalCreditsValue.toFixed(2);
+    }
+
+    function calculatePercentage() {
+      const obtained = parseFloat(obtainedMarks.value);
+      const total = parseFloat(totalMarks.value);
+      if (!Number.isFinite(obtained) || !Number.isFinite(total) || total <= 0) {
+        percentResult.textContent = '0.00%';
+        percentNote.textContent = 'Enter valid marks to calculate your percentage.';
+        return;
+      }
+
+      const percentage = (obtained / total) * 100;
+      percentResult.textContent = `${percentage.toFixed(2)}%`;
+
+      if (percentConversion.value === 'cgpa') {
+        const scaleValue = parseFloat(scale.value);
+        const estimatedCgpa = 0.75 + (percentage / 10);
+        const normalizedCgpa = scaleValue === 4 ? estimatedCgpa * 0.4 : estimatedCgpa;
+        percentNote.textContent = `Estimated CGPA: ${normalizedCgpa.toFixed(2)} (${scaleValue}-point scale).`;
+      } else {
+        percentNote.textContent = 'Use this percentage result for exam or semester comparisons.';
+      }
+    }
+
+    addSubjectButton.addEventListener('click', () => {
+      subjectList.appendChild(createSubjectRow());
+      calculateCgpa();
+    });
+
+    clearSubjectButton.addEventListener('click', () => {
+      subjectList.innerHTML = '';
+      subjectCount = 0;
+      calculateCgpa();
+    });
+
+    [
+      { selector: '#subject-list', event: 'input' },
+      { selector: '#subject-list', event: 'change' },
+    ].forEach(({ selector, event }) => {
+      subjectList.addEventListener(event, (evt) => {
+        if (evt.target.closest('.subject-row')) {
+          calculateCgpa();
+        }
+      });
+    });
+
+    calculatePercent.addEventListener('click', calculatePercentage);
+    [obtainedMarks, totalMarks, percentConversion, scale].forEach((input) => {
+      input.addEventListener('input', calculatePercentage);
+      input.addEventListener('change', calculatePercentage);
+    });
+
+    resetPercent.addEventListener('click', () => {
+      obtainedMarks.value = '';
+      totalMarks.value = '';
+      percentConversion.value = 'plain';
+      scale.value = '10';
+      percentResult.textContent = '0.00%';
+      percentNote.textContent = '';
+    });
+
+    function initialize() {
+      for (let i = 0; i < 3; i += 1) {
+        subjectList.appendChild(createSubjectRow());
+      }
+      calculateCgpa();
+      calculatePercentage();
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
